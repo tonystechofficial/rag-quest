@@ -67,6 +67,17 @@ Each quest has one hint written as a way of thinking, not a solution ("count she
 
 "Oracle Restored" (a star everywhere) unlocks a downloadable PNG certificate (`features/badges/certificate.ts`, drawn on a canvas, name optional). "RAG Grandmaster" (three stars everywhere) is the completionist goal.
 
+## Visual identity: the card catalogue
+
+The first version shipped with the default look of generated interfaces (navy, a cyan-to-violet gradient, emoji as icons, a rounded card for everything). The redesign takes its material from the fiction: the Archive is a library, so the interface is its card catalogue.
+
+- **Material**: a desk of buff paper (`--desk`), index cards (`--card`) with blue ruled lines and a red header rule, a divider tab on the top-left of important cards, a hard offset shadow instead of a soft one.
+- **Type**: Barlow Condensed for labels, headings and buttons (drawer labels), Courier Prime for everything "typed" on a card (quest log, scores, tokens, the mentor's notes in italic), Source Serif 4 for running explanations, where a typewriter face would tire the eye.
+- **Colour**: ink for text and actions, one red for the header rule and the stamps, brass for stars and progress, a green pencil for correct answers, a pen blue for links and selection. Semantic colours (good, warning, danger) come from the same five inks.
+- **States as stamps**: CLEARED and ATTEMPTED on the result card, LOCKED / IN PROGRESS / COMPLETE on wing cards, WING BOSS on the last card of a wing, badges as stamped titles. The stamp lands with a short scale animation; there is no confetti.
+- **Icons**: a small inline SVG stroke set (`shared/icon.ts`) replaces every emoji.
+- **Tokens**: everything lives in `src/styles.scss`; the engines only use the semantic aliases (`--surface`, `--border`, `--accent`, `--success`…), so they took the new look without changes.
+
 ## Deliberate non-features
 
 - No timers: speed teaches nothing here.

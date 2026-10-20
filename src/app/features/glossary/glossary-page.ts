@@ -3,17 +3,18 @@ import { RouterLink } from '@angular/router';
 import { GLOSSARY } from '../../content/glossary';
 import { WORLDS } from '../../content/worlds';
 import { ProgressService } from '../../core/progress.service';
+import { Icon } from '../../shared/icon';
 
 @Component({
   selector: 'app-glossary-page',
-  imports: [RouterLink],
+  imports: [RouterLink, Icon],
   template: `
     <div class="container page stack">
       <header class="row row-between" style="align-items: flex-end">
         <div>
-          <span class="eyebrow">{{ entries.length }} terms</span>
+          <span class="eyebrow">{{ entries.length }} cards</span>
           <h1>Glossary</h1>
-          <p class="muted" style="margin: 0">The vocabulary of the three wings, in plain words.</p>
+          <p style="margin: 0">The vocabulary of the three wings, in plain words.</p>
         </div>
         <input
           type="search"
@@ -30,14 +31,18 @@ import { ProgressService } from '../../core/progress.service';
         @if (items.length) {
           <section class="stack-sm">
             <div class="row" style="gap: 10px">
-              <span class="pill pill-{{ world.id }}">{{ world.icon }} {{ world.wing }}</span>
-              <a class="small" [routerLink]="['/world', world.id]">enter this wing →</a>
+              <span class="pill pill-{{ world.id }}"
+                ><app-icon [name]="world.icon" /> {{ world.wing }}</span
+              >
+              <a class="small" [routerLink]="['/world', world.id]">open this drawer</a>
             </div>
             <div class="grid grid-2">
               @for (entry of items; track entry.term) {
                 <div class="card-soft">
-                  <strong>{{ entry.term }}</strong>
-                  <p class="small muted" style="margin: 4px 0 0">{{ entry.definition }}</p>
+                  <strong class="label" style="color: var(--ink); font-size: 0.95rem">{{
+                    entry.term
+                  }}</strong>
+                  <p class="small" style="margin: 4px 0 0">{{ entry.definition }}</p>
                 </div>
               }
             </div>
@@ -45,7 +50,7 @@ import { ProgressService } from '../../core/progress.service';
         }
       }
       @if (filtered().length === 0) {
-        <p class="muted">No term matches “{{ query() }}”.</p>
+        <p class="muted typed">No card matches “{{ query() }}”.</p>
       }
     </div>
   `,

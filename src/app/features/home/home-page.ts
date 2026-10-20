@@ -6,21 +6,21 @@ import { BADGES } from '../../core/domain/achievements';
 import { bossOf, wingOrder } from '../../core/domain/progression';
 import { WorldId } from '../../core/models';
 import { ProgressService } from '../../core/progress.service';
+import { Icon } from '../../shared/icon';
 
 @Component({
   selector: 'app-home-page',
-  imports: [RouterLink],
+  imports: [RouterLink, Icon],
   template: `
     <div class="container page">
       <section class="hero">
         <div class="hero-copy stack">
-          <span class="eyebrow"
-            >A game about data, language and retrieval · free · open source</span
-          >
+          <span class="eyebrow">Catalogue of the Archive · free · open source · no account</span>
           <h1>
-            The Oracle is <span class="gradient-text">hallucinating</span>. Restore the Archive.
+            The Oracle is <span class="gradient-text">hallucinating</span>.<br />Restore the
+            Archive.
           </h1>
-          <p class="lead muted">
+          <p class="lead">
             {{ levelCount }} quests across three wings: clean the Data Vault, teach the Language
             Hall to read, rebuild the Retrieval Engine. Each quest is a hands-on puzzle with the
             real numbers behind it, and ends with a takeaway you can use at work tomorrow.
@@ -35,59 +35,56 @@ import { ProgressService } from '../../core/progress.service';
           <div class="row">
             @if (progress.nextQuest(); as next) {
               <a class="btn btn-primary" [routerLink]="['/play', next.id]">
-                {{ progress.completedLevels() ? 'Continue' : 'Start playing' }} → {{ next.title }}
+                {{ progress.completedLevels() ? 'Continue' : 'Start playing' }}
+                <app-icon name="arrow-right" /> {{ next.title }}
               </a>
             } @else {
-              <a class="btn btn-primary" routerLink="/badges">Archive restored — see your badges</a>
+              <a class="btn btn-primary" routerLink="/badges">Archive restored, see your badges</a>
             }
             <a class="btn btn-ghost" routerLink="/glossary">Glossary</a>
           </div>
         </div>
 
-        <div class="card hero-stats">
-          <div class="eyebrow" style="grid-column: 1 / -1">Quest log</div>
-          <div class="stat">
-            <span class="eyebrow">Rank</span><strong>{{ progress.rank().title }}</strong>
-          </div>
-          <div class="stat">
-            <span class="eyebrow">XP</span
-            ><strong class="mono">{{ progress.totalXp() }} / {{ totalXp }}</strong>
-          </div>
-          <div class="stat">
-            <span class="eyebrow">Stars</span
-            ><strong>★ {{ progress.totalStars() }} / {{ levelCount * 3 }}</strong>
-          </div>
-          <div class="stat">
-            <span class="eyebrow">Badges</span
-            ><a routerLink="/badges"
-              ><strong>🏅 {{ progress.badges().length }} / {{ badgeCount }}</strong></a
-            >
-          </div>
-          <div class="stat">
-            <span class="eyebrow">Streak</span
-            ><strong>{{
+        <aside class="card ruled tabbed quest-log">
+          <span class="tab">Quest log · apprentice record</span>
+          <p class="typed">
+            Rank <span class="leader">..........</span> <b>{{ progress.rank().title }}</b>
+          </p>
+          <p class="typed">
+            Experience <span class="leader">....</span>
+            <b>{{ progress.totalXp() }} / {{ totalXp }} XP</b>
+          </p>
+          <p class="typed">
+            Stars <span class="leader">.........</span>
+            <b>{{ progress.totalStars() }} / {{ levelCount * 3 }}</b>
+          </p>
+          <p class="typed">
+            Badges <span class="leader">........</span>
+            <a routerLink="/badges">{{ progress.badges().length }} / {{ badgeCount }}</a>
+          </p>
+          <p class="typed">
+            Streak <span class="leader">........</span>
+            {{
               progress.streak() > 0
-                ? '🔥 ' + progress.streak() + ' day' + (progress.streak() > 1 ? 's' : '')
-                : '—'
-            }}</strong>
-          </div>
-          <div class="stat">
-            <span class="eyebrow">Quests cleared</span
-            ><strong>{{ progress.completedLevels() }} / {{ levelCount }}</strong>
-          </div>
-          <div class="progress" style="grid-column: 1 / -1">
+                ? progress.streak() + ' day' + (progress.streak() > 1 ? 's' : '')
+                : 'none yet'
+            }}
+          </p>
+          <p class="typed">
+            Quests cleared <span class="leader">.</span>
+            <b>{{ progress.completedLevels() }} / {{ levelCount }}</b>
+          </p>
+          <div class="progress" style="margin-top: 10px">
             <span [style.width.%]="(progress.totalXp() / totalXp) * 100"></span>
           </div>
           @if (progress.rank().next; as next) {
-            <div class="small faint" style="grid-column: 1 / -1">
+            <p class="typed small faint">
               {{ next.minXp - progress.totalXp() }} XP to {{ next.title }}
-            </div>
+            </p>
           } @else {
-            <div class="small faint" style="grid-column: 1 / -1">
-              Top rank reached. {{ mentor.restored }}
-            </div>
+            <p class="typed small faint">Top rank reached.</p>
           }
-        </div>
+        </aside>
       </section>
 
       <section class="stack" style="margin-top: 44px">
@@ -95,39 +92,33 @@ import { ProgressService } from '../../core/progress.service';
           <span class="eyebrow"
             >Three wings, {{ levelCount }} quests · beat a wing's boss to open the next</span
           >
-          <h2>The Archive</h2>
+          <h2>The drawers of the Archive</h2>
         </div>
-        <div class="grid grid-3">
+        <div class="grid grid-3 wings">
           @for (world of worlds; track world.id) {
             @let stats = worldStats(world.id);
             @let open = progress.isWingOpen(world.id);
             <a
-              class="card card-link world-card world-{{ world.id }}"
+              class="card tabbed card-link world-card world-{{ world.id }}"
               [class.lock]="!open"
               [routerLink]="['/world', world.id]"
             >
-              <div class="row row-between">
-                <div class="world-icon">{{ world.icon }}</div>
-                @if (!open) {
-                  <span class="pill">🔒 Locked</span>
-                } @else if (stats.stars === stats.levels * 3) {
-                  <span class="pill pill-good">Mastered</span>
-                } @else if (stats.stars > 0) {
-                  <span class="pill pill-{{ world.id }}">In progress</span>
-                }
-              </div>
-              <span class="eyebrow">{{ world.name }}</span>
+              <span class="tab">{{ world.name }}</span>
+              @if (!open) {
+                <span class="stamp stamp-ink stamp-sm stamp-corner">Locked</span>
+              } @else if (stats.stars === stats.levels * 3) {
+                <span class="stamp stamp-green stamp-sm stamp-corner">Complete</span>
+              } @else if (stats.stars > 0) {
+                <span class="stamp stamp-brass stamp-sm stamp-corner">In progress</span>
+              }
+              <div class="world-icon"><app-icon [name]="world.icon" /></div>
               <h3>{{ world.wing }}</h3>
-              <p class="muted small">{{ world.description }}</p>
-              <div class="row row-between small" style="margin-top: auto">
-                <span>{{ stats.levels }} quests</span>
-                <span style="color: var(--warning)"
-                  >★ {{ stats.stars }} / {{ stats.levels * 3 }}</span
-                >
-              </div>
-              <div class="progress" style="margin-top: 8px">
-                <span [style.width.%]="stats.pct"></span>
-              </div>
+              <p class="small">{{ world.description }}</p>
+              <p class="typed small" style="margin-top: auto">
+                {{ stats.levels }} quests <span class="leader">·</span>
+                <span class="stars">{{ starsText(stats.stars, stats.levels * 3) }}</span>
+              </p>
+              <div class="progress"><span [style.width.%]="stats.pct"></span></div>
               @if (!open) {
                 <p class="small faint" style="margin: 8px 0 0">{{ unlockHint(world.id) }}</p>
               }
@@ -136,39 +127,22 @@ import { ProgressService } from '../../core/progress.service';
         </div>
       </section>
 
-      <section style="margin-top: 48px">
-        <div class="grid grid-3">
-          <div class="card">
-            <div class="step-badge">1</div>
-            <h3>Play a quest</h3>
-            <p class="muted small">
-              Hands-on puzzles, not slides: click tokens, drag pipeline stages, tune sliders on a
-              real document. Stuck? Ask Ada for a hint.
-            </p>
-          </div>
-          <div class="card">
-            <div class="step-badge">2</div>
-            <h3>Read the why</h3>
-            <p class="muted small">
-              Every answer comes with an explanation and the real numbers behind it: TF-IDF tables,
-              distances, retrieval scores.
-            </p>
-          </div>
-          <div class="card">
-            <div class="step-badge">3</div>
-            <h3>Earn stars, XP and badges</h3>
-            <p class="muted small">
-              Three stars at 90%. Bonuses for first-try perfection and flawless runs,
-              {{ badgeCount }}
-              badges to collect, a certificate when the Oracle is restored.
-            </p>
-          </div>
+      <section style="margin-top: 48px" class="grid grid-2">
+        <div class="card ruled tabbed">
+          <span class="tab">Instructions for apprentices</span>
+          <p class="typed">
+            1. Pull a card and play its rounds: click tokens, drag pipeline stages, tune sliders on
+            real text.
+          </p>
+          <p class="typed">
+            2. Read the why. Every answer comes with the rule and the real numbers behind it.
+          </p>
+          <p class="typed">
+            3. Earn stars, XP and badges. Three stars at 90%. Stuck? Ask Ada for a hint.
+          </p>
         </div>
-      </section>
-
-      <section style="margin-top: 48px">
         <div class="card">
-          <div class="eyebrow">Concepts you will practice</div>
+          <span class="eyebrow">Concepts you will practice</span>
           <div class="row" style="margin-top: 10px; gap: 8px">
             @for (level of levels; track level.id) {
               <a class="pill pill-{{ level.world }}" [routerLink]="['/play', level.id]">{{
@@ -183,75 +157,60 @@ import { ProgressService } from '../../core/progress.service';
   styles: `
     .hero {
       display: grid;
-      grid-template-columns: 1.4fr 1fr;
-      gap: 28px;
-      align-items: center;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 32px;
+      align-items: start;
       padding-top: 24px;
     }
     .lead {
-      font-size: 1.1rem;
-      max-width: 60ch;
+      font-size: 1.12rem;
+      max-width: 58ch;
     }
-    .hero-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px 18px;
+    .quest-log {
+      margin-top: 26px;
     }
-    .stat {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .stat strong {
-      font-size: 1.05rem;
-    }
-    .stat a {
-      color: inherit;
+    .quest-log a {
+      color: var(--pen-blue);
     }
     .world-card {
       display: flex;
       flex-direction: column;
-      min-height: 250px;
+      min-height: 260px;
+      padding-top: 24px;
     }
     .world-card.lock {
-      opacity: 0.75;
-    }
-    .world-card.lock .world-icon {
-      filter: grayscale(1);
+      opacity: 0.8;
     }
     .world-icon {
-      font-size: 1.8rem;
-      width: 54px;
-      height: 54px;
+      width: 46px;
+      height: 46px;
       display: grid;
       place-items: center;
-      border-radius: 16px;
-      background: var(--surface-3);
-      margin-bottom: 12px;
+      border: 1.5px solid var(--ink);
+      background: var(--card-2);
+      margin-bottom: 10px;
+      font-size: 1.4rem;
     }
     .world-data .world-icon {
-      background: color-mix(in srgb, var(--world-data) 18%, var(--surface-2));
+      color: var(--world-data);
+      border-color: var(--world-data);
     }
     .world-nlp .world-icon {
-      background: color-mix(in srgb, var(--world-nlp) 18%, var(--surface-2));
+      color: var(--world-nlp);
+      border-color: var(--world-nlp);
     }
     .world-rag .world-icon {
-      background: color-mix(in srgb, var(--world-rag) 18%, var(--surface-2));
+      color: var(--world-rag);
+      border-color: var(--world-rag);
     }
-    .step-badge {
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      display: grid;
-      place-items: center;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      color: #07101f;
-      margin-bottom: 12px;
+    .world-card h3 {
+      margin-bottom: 4px;
+    }
+    a.pill {
+      text-decoration: none;
     }
     a.pill:hover {
-      text-decoration: none;
-      filter: brightness(1.2);
+      background: var(--card);
     }
     @media (max-width: 860px) {
       .hero {
@@ -282,13 +241,17 @@ export class HomePage {
     };
   }
 
+  starsText(earned: number, total: number): string {
+    return `${earned} / ${total} ★`;
+  }
+
   unlockHint(worldId: WorldId): string {
     const order = wingOrder(LEVELS);
     const previous = order[order.indexOf(worldId) - 1];
     const boss = previous ? bossOf(previous, LEVELS) : undefined;
     const previousWorld = WORLDS.find((world) => world.id === previous);
     return boss && previousWorld
-      ? `Beat ${boss.title}, the boss of ${previousWorld.wing}, to open this wing.`
+      ? `Beat ${boss.title}, the boss of ${previousWorld.wing}, to open this drawer.`
       : '';
   }
 }

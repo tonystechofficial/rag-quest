@@ -13,6 +13,7 @@ import {
 import { bossOf, isBossQuest, wingOrder } from '../../core/domain/progression';
 import { ChallengeResult } from '../../core/models';
 import { ProgressService, RecordOutcome } from '../../core/progress.service';
+import { Icon } from '../../shared/icon';
 import { BucketSortEngine } from './engines/bucket-sort-engine';
 import { ChunkLabEngine } from './engines/chunk-lab-engine';
 import { ClaimCheckEngine } from './engines/claim-check-engine';
@@ -29,6 +30,7 @@ import { ResultPanel } from './result-panel';
   selector: 'app-play-page',
   imports: [
     RouterLink,
+    Icon,
     ResultPanel,
     McqEngine,
     TokenSelectEngine,
@@ -44,22 +46,22 @@ import { ResultPanel } from './result-panel';
   template: `
     <div class="container page stack">
       @if (level(); as lvl) {
-        <nav class="row small muted" aria-label="Breadcrumb">
+        <nav class="row small mono" aria-label="Breadcrumb">
           <a routerLink="/">The Archive</a>
-          <span>/</span>
+          <span class="faint">/</span>
           <a [routerLink]="['/world', lvl.world]">{{ world()?.wing }}</a>
-          <span>/</span>
-          <span>Quest {{ position() }} of {{ wingSize() }}</span>
+          <span class="faint">/</span>
+          <span>Card {{ position() }} of {{ wingSize() }}</span>
         </nav>
         <header class="row row-between" style="align-items: flex-start">
           <div>
-            <div class="row" style="gap: 8px">
+            <div class="row" style="gap: 14px">
               <h1 style="margin: 0">{{ lvl.title }}</h1>
               @if (isBoss()) {
-                <span class="pill pill-warn">👑 Wing boss</span>
+                <span class="stamp stamp-brass stamp-sm">Wing boss</span>
               }
             </div>
-            <p class="muted" style="margin: 4px 0 0">{{ lvl.tagline }}</p>
+            <p class="muted" style="margin: 4px 0 0; font-style: italic">{{ lvl.tagline }}</p>
           </div>
           <div class="row small">
             <span class="pill pill-{{ lvl.world }}">{{ lvl.concept }}</span>
@@ -73,8 +75,8 @@ import { ResultPanel } from './result-panel';
             <div class="mentor">
               <div class="mentor-avatar" aria-hidden="true">A</div>
               <div class="mentor-bubble">
-                <span class="mentor-name">{{ mentor.name }}</span>
-                {{ lockReason() }}
+                <span class="mentor-name">{{ mentor.name }}</span
+                >{{ lockReason() }}
               </div>
             </div>
             <div class="actions" style="justify-content: flex-start">
@@ -87,14 +89,14 @@ import { ResultPanel } from './result-panel';
                 >Back to {{ world()?.wing }}</a
               >
               <button type="button" class="btn btn-ghost" (click)="progress.setFreePlay(true)">
-                Switch on free play
+                <app-icon name="unlock" /> Switch on free play
               </button>
             </div>
           </div>
         } @else if (result(); as res) {
           <app-result-panel [level]="lvl" [result]="res" [outcome]="outcome()!" (retry)="retry()" />
         } @else {
-          <p class="story">{{ lvl.story }}</p>
+          <p class="story typed">{{ lvl.story }}</p>
           <div class="passage">{{ lvl.challenge.intro }}</div>
           <div class="card">
             @let c = lvl.challenge;
@@ -140,7 +142,7 @@ import { ResultPanel } from './result-panel';
       } @else {
         <div class="card stack">
           <h1>Unknown quest</h1>
-          <p class="muted">There is no quest at this address.</p>
+          <p class="muted">There is no card at this address.</p>
           <div><a class="btn btn-primary" routerLink="/">Back to the Archive</a></div>
         </div>
       }
@@ -149,7 +151,7 @@ import { ResultPanel } from './result-panel';
   styles: `
     .story {
       font-style: italic;
-      color: var(--text-muted);
+      color: var(--ink-2);
       margin: 0;
     }
     .hint-box {
@@ -230,7 +232,7 @@ export class PlayPage {
     }
     const previous = previousInWing(level.id);
     return previous
-      ? `One shelf at a time. Earn at least one star in ${previous.title} and this quest unlocks.`
+      ? `One shelf at a time. Earn at least one star in ${previous.title} and this card unlocks.`
       : 'This quest is locked.';
   }
 
@@ -241,9 +243,7 @@ export class PlayPage {
 
   onCompleted(result: ChallengeResult): void {
     const level = this.level();
-    if (!level) {
-      return;
-    }
+    if (!level) return;
     this.outcome.set(this.progress.record(level, result, this.hinted()));
     this.result.set(result);
     globalThis.scrollTo?.({ top: 0, behavior: 'smooth' });

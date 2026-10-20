@@ -10,7 +10,7 @@ export const WORLDS: World[] = [
     wing: 'The Data Vault',
     tagline: 'Garbage in, garbage out.',
     description: 'Clean, measure, split and shape data before any model touches it.',
-    icon: '🧹',
+    icon: 'archive',
     story:
       "Every answer the Oracle gives starts as a row in a ledger or a line in a file. The Vault's ledgers " +
       'are full of holes, duplicates and impossible numbers, and the Oracle repeats them with total ' +
@@ -24,7 +24,7 @@ export const WORLDS: World[] = [
     wing: 'The Language Hall',
     tagline: 'Teach the machine to read.',
     description: 'Tokens, stopwords, lemmas, TF-IDF, embeddings, entities and sentiment.',
-    icon: '🔤',
+    icon: 'type',
     story:
       'Before the Archive can retrieve anything, it has to read: cut text into tokens, drop the noise, weigh ' +
       'the words, place meaning in space. In this hall you teach it, one mechanism at a time, and you learn ' +
@@ -38,7 +38,7 @@ export const WORLDS: World[] = [
     wing: 'The Retrieval Engine',
     tagline: 'Give the model a library, not a memory.',
     description: 'Chunk, retrieve, budget the context and check every claim of the answer.',
-    icon: '📚',
+    icon: 'book',
     story:
       'Here the Oracle looks things up before it speaks. Chunk the shelves, retrieve the right passages, fit ' +
       "them into the Oracle's limited memory, and check every claim it makes against the sources. Rebuild " +

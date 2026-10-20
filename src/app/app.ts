@@ -2,17 +2,18 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { BADGES } from './core/domain/achievements';
 import { ProgressService } from './core/progress.service';
+import { Icon } from './shared/icon';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Icon],
   template: `
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="topbar">
       <div class="container topbar-inner">
         <a routerLink="/" class="brand" aria-label="RAG Quest home">
-          <img src="favicon.svg" alt="" width="28" height="28" />
-          <span>RAG <span class="gradient-text">Quest</span></span>
+          <span class="plate"><app-icon name="drawer" /> RAG Quest</span>
+          <span class="brand-sub">Catalogue of the Archive</span>
         </a>
         <nav class="nav" aria-label="Main">
           <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
@@ -27,18 +28,18 @@ import { ProgressService } from './core/progress.service';
         <div class="status">
           @if (progress.streak() > 0) {
             <span class="pill pill-warn" title="Days played in a row"
-              >🔥 {{ progress.streak() }}</span
+              ><app-icon name="flame" /> {{ progress.streak() }}</span
             >
           }
           <a class="pill" routerLink="/badges" title="Badges earned"
-            >🏅 {{ progress.badges().length }} / {{ badgeCount }}</a
+            ><app-icon name="medal" /> {{ progress.badges().length }} / {{ badgeCount }}</a
           >
           <div class="xp" title="Your rank and experience points">
             <span class="xp-rank">{{ progress.rank().title }}</span>
             <span class="xp-value mono">{{ progress.totalXp() }} XP</span>
-            <span class="progress xp-bar" aria-hidden="true">
-              <span [style.width.%]="progress.rank().progress * 100"></span>
-            </span>
+            <span class="progress xp-bar" aria-hidden="true"
+              ><span [style.width.%]="progress.rank().progress * 100"></span
+            ></span>
           </div>
         </div>
       </div>
@@ -47,29 +48,33 @@ import { ProgressService } from './core/progress.service';
     <main id="main"><router-outlet /></main>
 
     <footer class="footer">
-      <div class="container footer-inner small muted">
-        <span>
+      <div class="container footer-inner small">
+        <span class="mono">
           RAG Quest · open source under the MIT license ·
           <a href="https://github.com/tonystechofficial/rag-quest" target="_blank" rel="noopener"
             >source on GitHub</a
           >
         </span>
         <span class="row" style="gap: 12px">
-          <label class="row" style="gap: 6px; cursor: pointer" title="Unlock every quest and wing">
+          <label
+            class="row label"
+            style="gap: 6px; cursor: pointer"
+            title="Unlock every quest and wing"
+          >
             <input
               type="checkbox"
               [checked]="progress.freePlay()"
               (change)="progress.setFreePlay($any($event.target).checked)"
-              style="accent-color: var(--accent)"
+              style="accent-color: var(--brass)"
             />
             Free play
           </label>
-          <span>Progress is saved in this browser only.</span>
+          <span class="muted">Progress is kept in this browser only.</span>
           @if (confirmReset()) {
             <button
               type="button"
               class="btn btn-sm"
-              style="border-color: var(--danger); color: var(--danger)"
+              style="border-color: var(--headrule); color: var(--headrule)"
               (click)="reset()"
             >
               Yes, erase my progress
@@ -89,9 +94,9 @@ import { ProgressService } from './core/progress.service';
     <div class="toasts" aria-live="polite">
       @for (toast of progress.toasts(); track toast.id) {
         <div class="toast" role="status">
-          <span class="toast-icon" aria-hidden="true">{{ toast.icon }}</span>
-          <div style="flex: 1">
-            <strong>{{ toast.title }}</strong>
+          <span class="stamp stamp-sm">Badge</span>
+          <div style="flex: 1; min-width: 0">
+            <strong class="label" style="color: var(--ink)">{{ toast.title }}</strong>
             <div class="small muted">{{ toast.text }}</div>
           </div>
           <button
@@ -100,7 +105,7 @@ import { ProgressService } from './core/progress.service';
             aria-label="Dismiss"
             (click)="progress.dismissToast(toast.id)"
           >
-            ✕
+            <app-icon name="x" />
           </button>
         </div>
       }
@@ -111,10 +116,9 @@ import { ProgressService } from './core/progress.service';
       position: absolute;
       left: -999px;
       top: 8px;
-      background: var(--accent);
-      color: #07101f;
+      background: var(--ink);
+      color: var(--card);
       padding: 8px 12px;
-      border-radius: 8px;
       z-index: 100;
     }
     .skip-link:focus {
@@ -124,57 +128,73 @@ import { ProgressService } from './core/progress.service';
       position: sticky;
       top: 0;
       z-index: 50;
-      backdrop-filter: blur(14px);
-      background: color-mix(in srgb, var(--bg) 78%, transparent);
-      border-bottom: 1px solid var(--border);
+      background: var(--card-3);
+      border-bottom: 3px double var(--ink-2);
     }
     .topbar-inner {
       display: flex;
       align-items: center;
-      gap: 20px;
-      min-height: 64px;
+      gap: 22px;
+      min-height: 66px;
     }
     .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .plate {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      font-weight: 900;
-      font-size: 1.15rem;
-      letter-spacing: -0.02em;
-      color: var(--text);
+      gap: 8px;
+      font-family: var(--font-label);
+      font-weight: 700;
+      font-size: 1.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 10px;
+      border: 1.5px solid var(--brass);
+      background: var(--card);
+      color: var(--ink);
+      box-shadow: 1px 1px 0 var(--brass);
     }
-    .brand:hover {
-      text-decoration: none;
+    .brand-sub {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--ink-2);
+      padding-left: 2px;
     }
     .nav {
       display: flex;
-      gap: 4px;
+      gap: 2px;
       flex: 1;
     }
     .nav a {
-      color: var(--text-muted);
-      padding: 6px 12px;
-      border-radius: 999px;
-      font-weight: 600;
+      font-family: var(--font-label);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       font-size: 0.95rem;
+      color: var(--ink-2);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-bottom: 3px solid transparent;
     }
     .nav a:hover {
-      color: var(--text);
-      text-decoration: none;
-      background: var(--surface-2);
+      color: var(--ink);
     }
     .nav a.active {
-      color: var(--text);
-      background: var(--surface-3);
+      color: var(--ink);
+      border-bottom-color: var(--headrule);
     }
     .status {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .status a.pill:hover {
+    .status a.pill {
       text-decoration: none;
-      filter: brightness(1.2);
     }
     .xp {
       display: grid;
@@ -184,10 +204,13 @@ import { ProgressService } from './core/progress.service';
       font-size: 0.85rem;
     }
     .xp-rank {
+      font-family: var(--font-label);
       font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
     .xp-value {
-      color: var(--text-muted);
+      color: var(--ink-2);
       text-align: right;
     }
     .xp-bar {
@@ -195,10 +218,10 @@ import { ProgressService } from './core/progress.service';
       height: 5px;
     }
     main {
-      min-height: calc(100vh - 64px - 90px);
+      min-height: calc(100vh - 66px - 90px);
     }
     .footer {
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--edge-strong);
       padding: 20px 0 28px;
       margin-top: 24px;
     }
@@ -209,7 +232,7 @@ import { ProgressService } from './core/progress.service';
       justify-content: space-between;
       align-items: center;
     }
-    @media (max-width: 720px) {
+    @media (max-width: 760px) {
       .topbar-inner {
         flex-wrap: wrap;
         gap: 8px 16px;
@@ -218,6 +241,7 @@ import { ProgressService } from './core/progress.service';
       .nav {
         order: 3;
         width: 100%;
+        flex-wrap: wrap;
       }
       .status {
         margin-left: auto;

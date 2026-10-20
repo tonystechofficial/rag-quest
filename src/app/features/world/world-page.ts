@@ -3,27 +3,27 @@ import { RouterLink } from '@angular/router';
 import { MENTOR } from '../../content/mentor';
 import { findWorld, LEVELS, levelsForWorld, WORLDS } from '../../content/worlds';
 import { bossOf, isBossQuest, wingOrder } from '../../core/domain/progression';
-import { WorldId } from '../../core/models';
 import { ProgressService } from '../../core/progress.service';
+import { Icon } from '../../shared/icon';
 import { Stars } from '../../shared/stars';
 
 @Component({
   selector: 'app-world-page',
-  imports: [RouterLink, Stars],
+  imports: [RouterLink, Stars, Icon],
   template: `
     <div class="container page stack">
       @if (world(); as w) {
-        <nav class="row small muted" aria-label="Breadcrumb">
+        <nav class="row small mono" aria-label="Breadcrumb">
           <a routerLink="/">The Archive</a>
-          <span>/</span>
+          <span class="faint">/</span>
           <span>{{ w.wing }}</span>
         </nav>
-        <header class="world-header card world-{{ w.id }}">
-          <div class="world-icon" [class.lock]="!open()">{{ w.icon }}</div>
-          <div style="flex: 1">
-            <span class="eyebrow">{{ w.name }} · wing {{ wingNumber() }} of {{ wingCount }}</span>
+        <header class="card tabbed world-header world-{{ w.id }}">
+          <span class="tab">{{ w.name }} · wing {{ wingNumber() }} of {{ wingCount }}</span>
+          <div class="world-icon" [class.lock]="!open()"><app-icon [name]="w.icon" /></div>
+          <div style="flex: 1; min-width: 0">
             <h1>{{ w.wing }}</h1>
-            <p class="muted">{{ w.story }}</p>
+            <p>{{ w.story }}</p>
             <div class="mentor">
               <div class="mentor-avatar" aria-hidden="true">A</div>
               <div class="mentor-bubble">
@@ -33,16 +33,15 @@ import { Stars } from '../../shared/stars';
             </div>
           </div>
           <div class="world-progress">
-            <div class="score-big gradient-text">
-              {{ earnedStars()
-              }}<span class="muted" style="font-size: 1.2rem"> / {{ levels().length * 3 }} ★</span>
-            </div>
+            <p class="typed">
+              <b>{{ earnedStars() }}</b> / {{ levels().length * 3 }} <span class="stars">★</span>
+            </p>
             <div class="progress">
               <span [style.width.%]="(earnedStars() / (levels().length * 3)) * 100"></span>
             </div>
-            <div class="small faint" style="margin-top: 6px">
-              {{ clearedCount() }} / {{ levels().length }} quests cleared
-            </div>
+            <p class="typed small faint">
+              {{ clearedCount() }} / {{ levels().length }} cards cleared
+            </p>
           </div>
         </header>
 
@@ -52,45 +51,44 @@ import { Stars } from '../../shared/stars';
             @let unlocked = progress.isUnlocked(level.id);
             @let boss = isBoss(level.id);
             <li
-              class="card level"
+              class="card tabbed level"
               [class.done]="result?.stars"
               [class.lock]="!unlocked"
               [class.boss]="boss"
             >
-              <div class="level-no mono" [class.boss-no]="boss">
+              <span class="tab">Card {{ i + 1 }} · {{ level.concept }}</span>
+              @if (boss) {
+                <span class="stamp stamp-brass stamp-sm stamp-corner">Wing boss</span>
+              } @else if (result?.stars === 3) {
+                <span class="stamp stamp-green stamp-sm stamp-corner">Complete</span>
+              }
+              <div class="level-no mono">
                 @if (!unlocked) {
-                  🔒
+                  <app-icon name="lock" />
                 } @else if (boss) {
-                  👑
+                  <app-icon name="crown" />
                 } @else {
                   {{ i + 1 }}
                 }
               </div>
               <div class="level-body">
-                <div class="row" style="gap: 8px">
-                  <h3 style="margin: 0">{{ level.title }}</h3>
-                  @if (boss) {
-                    <span class="pill pill-warn">Wing boss</span>
-                  }
-                  <span class="pill pill-{{ w.id }}">{{ level.concept }}</span>
-                </div>
-                <p class="muted small" style="margin: 4px 0 0">
+                <h3 style="margin: 0">{{ level.title }}</h3>
+                <p class="small" style="margin: 4px 0 0">
                   {{ unlocked ? level.story : level.tagline }}
                 </p>
-                <div class="row small faint" style="margin-top: 8px; gap: 10px">
-                  <span>~{{ level.minutes }} min</span>
-                  <span>{{ level.xp }} XP</span>
+                <p class="typed small faint" style="margin-top: 6px">
+                  ~{{ level.minutes }} min <span class="leader">·</span> {{ level.xp }} XP
                   @if (result) {
-                    <span
-                      >best {{ result.bestScore }}% · {{ result.attempts }} attempt{{
-                        result.attempts === 1 ? '' : 's'
-                      }}</span
-                    >
+                    <span class="leader">·</span> best {{ result.bestScore }}%
+                    <span class="leader">·</span> {{ result.attempts }} attempt{{
+                      result.attempts === 1 ? '' : 's'
+                    }}
                   }
                   @if (!unlocked) {
-                    <span style="color: var(--warning)">{{ questLockReason(level.id) }}</span>
+                    <span class="leader">·</span>
+                    <span style="color: var(--headrule)">{{ questLockReason(level.id) }}</span>
                   }
-                </div>
+                </p>
               </div>
               <div class="level-side">
                 <app-stars [count]="result?.stars ?? 0" />
@@ -101,10 +99,10 @@ import { Stars } from '../../shared/stars';
                     [class.btn-ghost]="result"
                     [routerLink]="['/play', level.id]"
                   >
-                    {{ result ? 'Replay' : boss ? 'Face the boss' : 'Play' }}
+                    {{ result ? 'Replay' : boss ? 'Face the boss' : 'Pull the card' }}
                   </a>
                 } @else {
-                  <span class="btn" aria-disabled="true">Locked</span>
+                  <span class="btn" aria-disabled="true"><app-icon name="lock" /> Locked</span>
                 }
               </div>
             </li>
@@ -113,9 +111,10 @@ import { Stars } from '../../shared/stars';
 
         <div class="row" style="justify-content: center; margin-top: 12px">
           @for (other of otherWorlds(); track other.id) {
-            <a class="btn btn-ghost" [routerLink]="['/world', other.id]"
-              >{{ progress.isWingOpen(other.id) ? other.icon : '🔒' }} {{ other.wing }}</a
-            >
+            <a class="btn btn-ghost" [routerLink]="['/world', other.id]">
+              <app-icon [name]="progress.isWingOpen(other.id) ? other.icon : 'lock'" />
+              {{ other.wing }}
+            </a>
           }
         </div>
       } @else {
@@ -132,82 +131,75 @@ import { Stars } from '../../shared/stars';
       gap: 20px;
       align-items: flex-start;
       flex-wrap: wrap;
+      padding-top: 26px;
     }
     .world-icon {
-      font-size: 2.6rem;
-      width: 84px;
-      height: 84px;
+      width: 64px;
+      height: 64px;
       display: grid;
       place-items: center;
-      border-radius: 20px;
-      background: var(--surface-3);
+      border: 1.5px solid var(--ink);
+      background: var(--card-2);
+      font-size: 1.9rem;
       flex: none;
     }
     .world-data .world-icon {
-      background: color-mix(in srgb, var(--world-data) 18%, var(--surface-2));
+      color: var(--world-data);
+      border-color: var(--world-data);
     }
     .world-nlp .world-icon {
-      background: color-mix(in srgb, var(--world-nlp) 18%, var(--surface-2));
+      color: var(--world-nlp);
+      border-color: var(--world-nlp);
     }
     .world-rag .world-icon {
-      background: color-mix(in srgb, var(--world-rag) 18%, var(--surface-2));
+      color: var(--world-rag);
+      border-color: var(--world-rag);
     }
     .world-progress {
       min-width: 200px;
     }
     .path {
       list-style: none;
-      margin: 0;
-      padding: 0 0 0 0;
+      margin: 10px 0 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      position: relative;
-    }
-    .path::before {
-      content: '';
-      position: absolute;
-      left: 40px;
-      top: 30px;
-      bottom: 30px;
-      width: 2px;
-      background: var(--border-strong);
-      z-index: 0;
+      gap: 22px;
     }
     .level {
       display: flex;
       gap: 16px;
       align-items: center;
-      position: relative;
-      z-index: 1;
+      padding-top: 24px;
     }
     .level.done {
-      border-color: color-mix(in srgb, var(--success) 40%, var(--border));
+      border-color: var(--pencil);
     }
     .level.lock {
-      opacity: 0.72;
+      opacity: 0.78;
     }
     .level.boss {
-      border-color: color-mix(in srgb, var(--warning) 55%, var(--border));
-      background: linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--warning) 8%, var(--surface)),
-        var(--surface)
-      );
+      background: var(--card-2);
+      border-color: var(--brass);
     }
     .level-no {
       width: 40px;
       height: 40px;
       display: grid;
       place-items: center;
-      border-radius: 12px;
-      background: var(--surface-3);
-      font-weight: 900;
+      border: 1.5px solid var(--ink);
+      background: var(--card-2);
+      font-weight: 700;
+      font-size: 1.1rem;
       flex: none;
     }
-    .level-no.boss-no {
-      background: color-mix(in srgb, var(--warning) 25%, var(--surface-3));
-      font-size: 1.3rem;
+    .level.lock .level-no {
+      border-style: dashed;
+      color: var(--ink-2);
+    }
+    .level.boss .level-no {
+      color: var(--brass);
+      border-color: var(--brass);
     }
     .level-body {
       flex: 1;
@@ -228,9 +220,6 @@ import { Stars } from '../../shared/stars';
         width: 100%;
         flex-direction: row;
         justify-content: space-between;
-      }
-      .path::before {
-        display: none;
       }
     }
   `,
@@ -275,7 +264,7 @@ export class WorldPage {
     const boss = previous ? bossOf(previous, LEVELS) : undefined;
     const previousWorld = WORLDS.find((candidate) => candidate.id === previous);
     return boss && previousWorld
-      ? `This wing is still locked. Beat ${boss.title}, the boss of ${previousWorld.wing}, and I will open the door. (Or switch on free play in the footer.)`
+      ? `This drawer is still locked. Beat ${boss.title}, the boss of ${previousWorld.wing}, and I will open it. (Or switch on free play in the footer.)`
       : 'This wing is locked.';
   }
 

@@ -39,6 +39,8 @@ No backend, no account: everything (including the tokenizer, TF-IDF retriever an
 - **Ada's hints**: one conceptual nudge per quest, never the answer. Using it only forfeits the flawless bonus.
 - **Badges**: 15 feats, from "Token Whisperer" (exact token count) to "RAG Grandmaster" (three stars everywhere), with a daily streak and a certificate to download once the Oracle is restored.
 
+- **Look**: the Archive is a library, so the interface is its card catalogue: buff index cards with ruled lines and tabs, typewritten entries, a red stamp when a quest is cleared, brass stars, ink buttons. One light look, no gradients, no emoji.
+
 The full design is in [docs/GAME-DESIGN.md](docs/GAME-DESIGN.md).
 
 ## How it is built

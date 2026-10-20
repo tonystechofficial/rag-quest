@@ -12,11 +12,11 @@ import { downloadCanvas, drawCertificate } from './certificate';
   template: `
     <div class="container page stack">
       <header>
-        <span class="eyebrow">{{ progress.badges().length }} of {{ badges.length }} earned</span>
+        <span class="eyebrow">{{ progress.badges().length }} of {{ badges.length }} stamped</span>
         <h1>Badges</h1>
-        <p class="muted" style="margin: 0">
-          Feats of an Archivist. Hover a badge to read how to earn it; most come from playing well,
-          a few from playing often.
+        <p style="margin: 0; max-width: 60ch">
+          Feats of an Archivist, stamped on your record. Most come from playing well, a few from
+          playing often.
         </p>
       </header>
 
@@ -29,38 +29,48 @@ import { downloadCanvas, drawCertificate } from './certificate';
             [class.lock]="!earned"
             [title]="badge.description"
           >
-            <div class="badge-icon">{{ earned ? badge.icon : '🔒' }}</div>
+            <div class="seal">
+              <span
+                class="stamp"
+                [class.stamp-ink]="!earned"
+                [class.stamp-sm]="badge.title.length > 16"
+                >{{ earned ? badge.title : 'Not yet' }}</span
+              >
+            </div>
             <div>
-              <strong>{{ badge.title }}</strong>
+              <strong class="label" style="color: var(--ink); font-size: 0.95rem">{{
+                badge.title
+              }}</strong>
               <div class="small muted">{{ badge.description }}</div>
             </div>
           </div>
         }
       </div>
 
-      <section class="card stack certificate" [class.ready]="restored()">
-        <div>
-          <span class="eyebrow">Certificate</span>
-          <h2>
-            {{
-              restored()
-                ? 'The Oracle speaks true again'
-                : 'Restore the Oracle to earn your certificate'
-            }}
-          </h2>
-          <p class="muted">
-            @if (restored()) {
-              {{ mentor.restored }}
-            } @else {
-              Earn at least one star on every quest of the Archive —
-              {{ progress.completedLevels() }} / {{ levelCount }} cleared so far.
-            }
-          </p>
-        </div>
+      <section class="card ruled tabbed certificate" [class.ready]="restored()">
+        <span class="tab">Certificate</span>
         @if (restored()) {
-          <div class="row" style="gap: 12px; align-items: flex-end">
+          <span class="stamp stamp-corner">Restored</span>
+        }
+        <h2>
+          {{
+            restored()
+              ? 'The Oracle speaks true again'
+              : 'Restore the Oracle to earn your certificate'
+          }}
+        </h2>
+        <p class="typed">
+          @if (restored()) {
+            {{ mentor.restored }}
+          } @else {
+            Earn at least one star on every card of the Archive <span class="leader">·</span>
+            {{ progress.completedLevels() }} / {{ levelCount }} cleared so far.
+          }
+        </p>
+        @if (restored()) {
+          <div class="row" style="gap: 12px; align-items: flex-end; margin-top: 10px">
             <label class="stack-sm" style="gap: 4px; flex: 1; min-width: 220px">
-              <span class="small muted">Name on the certificate</span>
+              <span class="label">Name on the certificate</span>
               <input
                 type="text"
                 maxlength="40"
@@ -77,15 +87,17 @@ import { downloadCanvas, drawCertificate } from './certificate';
             <img [src]="url" alt="Preview of your certificate" class="preview" />
           }
           @if (unsupported()) {
-            <p class="small" style="color: var(--warning)">
+            <p class="small" style="color: var(--headrule)">
               This browser cannot draw the certificate.
             </p>
           }
         } @else {
-          <div class="progress">
+          <div class="progress" style="margin-top: 10px">
             <span [style.width.%]="(progress.completedLevels() / levelCount) * 100"></span>
           </div>
-          <div><a class="btn btn-primary" routerLink="/">Back to the Archive</a></div>
+          <div style="margin-top: 14px">
+            <a class="btn btn-primary" routerLink="/">Back to the Archive</a>
+          </div>
         }
       </section>
     </div>
@@ -95,40 +107,39 @@ import { downloadCanvas, drawCertificate } from './certificate';
       display: flex;
       gap: 14px;
       align-items: center;
-      transition: transform 0.15s ease;
-    }
-    .badge.earned {
-      border-color: color-mix(in srgb, var(--warning) 50%, var(--border));
-      background: linear-gradient(
-        135deg,
-        color-mix(in srgb, var(--warning) 8%, var(--surface)),
-        var(--surface)
-      );
-    }
-    .badge.earned:hover {
-      transform: translateY(-2px);
     }
     .badge.lock {
-      opacity: 0.6;
+      opacity: 0.7;
     }
-    .badge-icon {
-      font-size: 2rem;
-      width: 56px;
-      height: 56px;
+    .badge.lock .stamp {
+      opacity: 0.6;
+      border-style: dashed;
+    }
+    .badge.earned {
+      border-color: var(--brass);
+    }
+    .seal {
+      width: 120px;
+      flex: none;
       display: grid;
       place-items: center;
-      border-radius: 16px;
-      background: var(--surface-3);
-      flex: none;
+    }
+    .seal .stamp {
+      font-size: 0.9rem;
+      text-align: center;
+      white-space: normal;
+      line-height: 1.15;
+      max-width: 118px;
     }
     .certificate.ready {
-      border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+      border-color: var(--pencil);
     }
     .preview {
+      display: block;
       width: 100%;
       max-width: 720px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
+      margin-top: 14px;
+      border: 1px solid var(--edge-strong);
     }
   `,
 })
