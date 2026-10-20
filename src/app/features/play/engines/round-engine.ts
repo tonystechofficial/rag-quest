@@ -44,10 +44,21 @@ export abstract class RoundEngine {
   }
 
   protected finish(): void {
-    this.completed.emit({ scorePct: Math.round(this.averageScore()), summary: this.summary() });
+    const scores = this.scores();
+    this.completed.emit({
+      scorePct: Math.round(this.averageScore()),
+      summary: this.summary(),
+      flawless: scores.length > 0 && scores.every((score) => score >= 90),
+      feats: this.feats(),
+    });
   }
 
   protected abstract summary(): string;
+
+  /** Notable feats of this run, used for badges (see achievements.ts). */
+  protected feats(): string[] {
+    return [];
+  }
 
   protected onRoundStart(): void {
     // Subclasses reset their per-round state here.

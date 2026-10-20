@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { BADGES } from './core/domain/achievements';
 import { ProgressService } from './core/progress.service';
 
 @Component({
@@ -15,19 +16,30 @@ import { ProgressService } from './core/progress.service';
         </a>
         <nav class="nav" aria-label="Main">
           <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
-            >Worlds</a
+            >Archive</a
           >
+          <a routerLink="/badges" routerLinkActive="active">Badges</a>
           <a routerLink="/glossary" routerLinkActive="active">Glossary</a>
           <a href="https://github.com/tonystechofficial/rag-quest" target="_blank" rel="noopener"
             >GitHub</a
           >
         </nav>
-        <div class="xp" title="Your rank and experience points">
-          <span class="xp-rank">{{ progress.rank().title }}</span>
-          <span class="xp-value mono">{{ progress.totalXp() }} XP</span>
-          <span class="progress xp-bar" aria-hidden="true">
-            <span [style.width.%]="progress.rank().progress * 100"></span>
-          </span>
+        <div class="status">
+          @if (progress.streak() > 0) {
+            <span class="pill pill-warn" title="Days played in a row"
+              >🔥 {{ progress.streak() }}</span
+            >
+          }
+          <a class="pill" routerLink="/badges" title="Badges earned"
+            >🏅 {{ progress.badges().length }} / {{ badgeCount }}</a
+          >
+          <div class="xp" title="Your rank and experience points">
+            <span class="xp-rank">{{ progress.rank().title }}</span>
+            <span class="xp-value mono">{{ progress.totalXp() }} XP</span>
+            <span class="progress xp-bar" aria-hidden="true">
+              <span [style.width.%]="progress.rank().progress * 100"></span>
+            </span>
+          </div>
         </div>
       </div>
     </header>
@@ -42,8 +54,17 @@ import { ProgressService } from './core/progress.service';
             >source on GitHub</a
           >
         </span>
-        <span class="row" style="gap: 8px">
-          Progress is saved in this browser only.
+        <span class="row" style="gap: 12px">
+          <label class="row" style="gap: 6px; cursor: pointer" title="Unlock every quest and wing">
+            <input
+              type="checkbox"
+              [checked]="progress.freePlay()"
+              (change)="progress.setFreePlay($any($event.target).checked)"
+              style="accent-color: var(--accent)"
+            />
+            Free play
+          </label>
+          <span>Progress is saved in this browser only.</span>
           @if (confirmReset()) {
             <button
               type="button"
@@ -64,6 +85,26 @@ import { ProgressService } from './core/progress.service';
         </span>
       </div>
     </footer>
+
+    <div class="toasts" aria-live="polite">
+      @for (toast of progress.toasts(); track toast.id) {
+        <div class="toast" role="status">
+          <span class="toast-icon" aria-hidden="true">{{ toast.icon }}</span>
+          <div style="flex: 1">
+            <strong>{{ toast.title }}</strong>
+            <div class="small muted">{{ toast.text }}</div>
+          </div>
+          <button
+            type="button"
+            class="btn btn-ghost btn-icon btn-sm"
+            aria-label="Dismiss"
+            (click)="progress.dismissToast(toast.id)"
+          >
+            ✕
+          </button>
+        </div>
+      }
+    </div>
   `,
   styles: `
     .skip-link {
@@ -126,6 +167,15 @@ import { ProgressService } from './core/progress.service';
       color: var(--text);
       background: var(--surface-3);
     }
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .status a.pill:hover {
+      text-decoration: none;
+      filter: brightness(1.2);
+    }
     .xp {
       display: grid;
       grid-template-columns: auto auto;
@@ -159,7 +209,7 @@ import { ProgressService } from './core/progress.service';
       justify-content: space-between;
       align-items: center;
     }
-    @media (max-width: 640px) {
+    @media (max-width: 720px) {
       .topbar-inner {
         flex-wrap: wrap;
         gap: 8px 16px;
@@ -169,7 +219,7 @@ import { ProgressService } from './core/progress.service';
         order: 3;
         width: 100%;
       }
-      .xp {
+      .status {
         margin-left: auto;
       }
     }
@@ -178,6 +228,7 @@ import { ProgressService } from './core/progress.service';
 export class App {
   protected readonly progress = inject(ProgressService);
   protected readonly confirmReset = signal(false);
+  protected readonly badgeCount = BADGES.length;
 
   protected reset(): void {
     this.progress.reset();

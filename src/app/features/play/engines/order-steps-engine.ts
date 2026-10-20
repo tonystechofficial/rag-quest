@@ -199,6 +199,7 @@ export class OrderStepsEngine {
   finish(): void {
     this.completed.emit({
       scorePct: this.score(),
+      flawless: this.score() >= 90,
       summary: `${this.exactCount()} of ${this.order().length} steps at their exact position`,
     });
   }

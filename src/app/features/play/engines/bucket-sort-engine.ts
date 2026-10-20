@@ -209,6 +209,7 @@ export class BucketSortEngine {
   finish(): void {
     this.completed.emit({
       scorePct: this.score(),
+      flawless: this.score() >= 90,
       summary: `${this.correctCount()} of ${this.challenge().cards.length} cards sorted correctly`,
     });
   }

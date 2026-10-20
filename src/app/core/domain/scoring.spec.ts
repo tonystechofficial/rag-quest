@@ -1,4 +1,5 @@
 import {
+  bonusXp,
   closenessScore,
   pickScore,
   placementScore,
@@ -8,6 +9,36 @@ import {
   starsForScore,
   xpForResult,
 } from './scoring';
+
+describe('bonusXp', () => {
+  it('gives a first-try bonus for three stars on the first attempt', () => {
+    expect(bonusXp({ scorePct: 92, attempts: 1, flawless: false, hinted: false })).toEqual({
+      firstTry: 10,
+      flawless: 0,
+      total: 10,
+    });
+  });
+
+  it('gives a flawless bonus when every round scored 90+ without a hint', () => {
+    expect(bonusXp({ scorePct: 95, attempts: 2, flawless: true, hinted: false })).toEqual({
+      firstTry: 0,
+      flawless: 20,
+      total: 20,
+    });
+  });
+
+  it('a hint cancels the flawless bonus but not the first-try bonus', () => {
+    expect(bonusXp({ scorePct: 95, attempts: 1, flawless: true, hinted: true })).toEqual({
+      firstTry: 10,
+      flawless: 0,
+      total: 10,
+    });
+  });
+
+  it('gives nothing below three stars on a first try', () => {
+    expect(bonusXp({ scorePct: 80, attempts: 1, flawless: false, hinted: false }).total).toBe(0);
+  });
+});
 
 describe('placementScore', () => {
   it('is 100 anywhere inside the tolerance radius', () => {

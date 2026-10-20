@@ -130,6 +130,10 @@ export class EstimateEngine extends RoundEngine {
     this.guess.set(8);
   }
 
+  protected override feats(): string[] {
+    return this.scores().some((score) => score === 100) ? ['exact-token-count'] : [];
+  }
+
   protected override summary(): string {
     return `Average closeness of ${Math.round(this.averageScore())}% over ${this.total()} texts`;
   }

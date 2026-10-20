@@ -3,9 +3,15 @@ export type WorldId = 'data' | 'nlp' | 'rag';
 export interface World {
   id: WorldId;
   name: string;
+  /** Narrative name of the wing of the Archive ("The Data Vault"). */
+  wing: string;
   tagline: string;
   description: string;
   icon: string;
+  /** One paragraph of story shown on the wing page. */
+  story: string;
+  /** What Ada, the mentor, says when you enter the wing. */
+  mentorIntro: string;
 }
 
 export type ChallengeKind =
@@ -28,6 +34,10 @@ export interface Level {
   concept: string;
   minutes: number;
   xp: number;
+  /** One or two sentences of story framing the quest. */
+  story: string;
+  /** Ada's hint: a conceptual nudge, never the answer. Using it forfeits the flawless bonus. */
+  hint: string;
   challenge: Challenge;
   takeaway: string;
 }
@@ -229,6 +239,10 @@ export interface ChunkLabChallenge {
 export interface ChallengeResult {
   scorePct: number;
   summary: string;
+  /** Every round scored 90% or more (single-round challenges: the score itself). */
+  flawless?: boolean;
+  /** Notable feats for badges: exact-token-count, all-claims-right, bullseye, chunk-95, all-issues-found. */
+  feats?: string[];
 }
 
 export interface GlossaryEntry {

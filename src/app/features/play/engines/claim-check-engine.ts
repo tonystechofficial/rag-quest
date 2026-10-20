@@ -113,6 +113,13 @@ export class ClaimCheckEngine extends RoundEngine {
     this.flags.set([]);
   }
 
+  protected override feats(): string[] {
+    const scores = this.scores();
+    return scores.length === this.total() && scores.every((score) => score === 100)
+      ? ['all-claims-right']
+      : [];
+  }
+
   protected override summary(): string {
     return `${Math.round(this.averageScore())}% of claims judged correctly`;
   }

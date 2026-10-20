@@ -1,6 +1,9 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { MENTOR } from '../../content/mentor';
 import { LEVELS, levelsForWorld, TOTAL_XP, WORLDS } from '../../content/worlds';
+import { BADGES } from '../../core/domain/achievements';
+import { bossOf, wingOrder } from '../../core/domain/progression';
 import { WorldId } from '../../core/models';
 import { ProgressService } from '../../core/progress.service';
 
@@ -11,22 +14,38 @@ import { ProgressService } from '../../core/progress.service';
     <div class="container page">
       <section class="hero">
         <div class="hero-copy stack">
-          <span class="eyebrow">Free · open source · no account · runs in your browser</span>
-          <h1>Learn <span class="gradient-text">Data, NLP &amp; RAG</span> by playing.</h1>
+          <span class="eyebrow"
+            >A game about data, language and retrieval · free · open source</span
+          >
+          <h1>
+            The Oracle is <span class="gradient-text">hallucinating</span>. Restore the Archive.
+          </h1>
           <p class="lead muted">
-            {{ levelCount }} bite-sized challenges: count tokens, place words in an embedding space,
-            tune chunking on a real document, rank retrieved passages and hunt hallucinations. Every
-            round ends with a takeaway you can use at work tomorrow.
+            {{ levelCount }} quests across three wings: clean the Data Vault, teach the Language
+            Hall to read, rebuild the Retrieval Engine. Each quest is a hands-on puzzle with the
+            real numbers behind it, and ends with a takeaway you can use at work tomorrow.
           </p>
+          <div class="mentor">
+            <div class="mentor-avatar" aria-hidden="true">A</div>
+            <div class="mentor-bubble">
+              <span class="mentor-name">{{ mentor.name }}, {{ mentor.role }}</span>
+              {{ mentor.welcome }}
+            </div>
+          </div>
           <div class="row">
-            <a class="btn btn-primary" [routerLink]="['/play', nextToPlay().id]">
-              {{ progress.completedLevels() ? 'Continue' : 'Start playing' }} →
-              {{ nextToPlay().title }}
-            </a>
+            @if (progress.nextQuest(); as next) {
+              <a class="btn btn-primary" [routerLink]="['/play', next.id]">
+                {{ progress.completedLevels() ? 'Continue' : 'Start playing' }} → {{ next.title }}
+              </a>
+            } @else {
+              <a class="btn btn-primary" routerLink="/badges">Archive restored — see your badges</a>
+            }
             <a class="btn btn-ghost" routerLink="/glossary">Glossary</a>
           </div>
         </div>
+
         <div class="card hero-stats">
+          <div class="eyebrow" style="grid-column: 1 / -1">Quest log</div>
           <div class="stat">
             <span class="eyebrow">Rank</span><strong>{{ progress.rank().title }}</strong>
           </div>
@@ -35,12 +54,26 @@ import { ProgressService } from '../../core/progress.service';
             ><strong class="mono">{{ progress.totalXp() }} / {{ totalXp }}</strong>
           </div>
           <div class="stat">
-            <span class="eyebrow">Challenges</span
-            ><strong>{{ progress.completedLevels() }} / {{ levelCount }}</strong>
+            <span class="eyebrow">Stars</span
+            ><strong>★ {{ progress.totalStars() }} / {{ levelCount * 3 }}</strong>
           </div>
           <div class="stat">
-            <span class="eyebrow">Stars</span
-            ><strong>{{ progress.totalStars() }} / {{ levelCount * 3 }}</strong>
+            <span class="eyebrow">Badges</span
+            ><a routerLink="/badges"
+              ><strong>🏅 {{ progress.badges().length }} / {{ badgeCount }}</strong></a
+            >
+          </div>
+          <div class="stat">
+            <span class="eyebrow">Streak</span
+            ><strong>{{
+              progress.streak() > 0
+                ? '🔥 ' + progress.streak() + ' day' + (progress.streak() > 1 ? 's' : '')
+                : '—'
+            }}</strong>
+          </div>
+          <div class="stat">
+            <span class="eyebrow">Quests cleared</span
+            ><strong>{{ progress.completedLevels() }} / {{ levelCount }}</strong>
           </div>
           <div class="progress" style="grid-column: 1 / -1">
             <span [style.width.%]="(progress.totalXp() / totalXp) * 100"></span>
@@ -51,7 +84,7 @@ import { ProgressService } from '../../core/progress.service';
             </div>
           } @else {
             <div class="small faint" style="grid-column: 1 / -1">
-              Top rank reached — thank you for playing!
+              Top rank reached. {{ mentor.restored }}
             </div>
           }
         </div>
@@ -59,21 +92,35 @@ import { ProgressService } from '../../core/progress.service';
 
       <section class="stack" style="margin-top: 44px">
         <div>
-          <span class="eyebrow">Three worlds, {{ levelCount }} challenges</span>
-          <h2>Pick a world</h2>
+          <span class="eyebrow"
+            >Three wings, {{ levelCount }} quests · beat a wing's boss to open the next</span
+          >
+          <h2>The Archive</h2>
         </div>
         <div class="grid grid-3">
           @for (world of worlds; track world.id) {
             @let stats = worldStats(world.id);
+            @let open = progress.isWingOpen(world.id);
             <a
               class="card card-link world-card world-{{ world.id }}"
+              [class.lock]="!open"
               [routerLink]="['/world', world.id]"
             >
-              <div class="world-icon">{{ world.icon }}</div>
-              <h3>{{ world.name }}</h3>
+              <div class="row row-between">
+                <div class="world-icon">{{ world.icon }}</div>
+                @if (!open) {
+                  <span class="pill">🔒 Locked</span>
+                } @else if (stats.stars === stats.levels * 3) {
+                  <span class="pill pill-good">Mastered</span>
+                } @else if (stats.stars > 0) {
+                  <span class="pill pill-{{ world.id }}">In progress</span>
+                }
+              </div>
+              <span class="eyebrow">{{ world.name }}</span>
+              <h3>{{ world.wing }}</h3>
               <p class="muted small">{{ world.description }}</p>
               <div class="row row-between small" style="margin-top: auto">
-                <span>{{ stats.levels }} challenges</span>
+                <span>{{ stats.levels }} quests</span>
                 <span style="color: var(--warning)"
                   >★ {{ stats.stars }} / {{ stats.levels * 3 }}</span
                 >
@@ -81,6 +128,9 @@ import { ProgressService } from '../../core/progress.service';
               <div class="progress" style="margin-top: 8px">
                 <span [style.width.%]="stats.pct"></span>
               </div>
+              @if (!open) {
+                <p class="small faint" style="margin: 8px 0 0">{{ unlockHint(world.id) }}</p>
+              }
             </a>
           }
         </div>
@@ -90,10 +140,10 @@ import { ProgressService } from '../../core/progress.service';
         <div class="grid grid-3">
           <div class="card">
             <div class="step-badge">1</div>
-            <h3>Play a round</h3>
+            <h3>Play a quest</h3>
             <p class="muted small">
-              Interactive challenges, not slides: click tokens, drag pipeline stages, tune sliders
-              on real text.
+              Hands-on puzzles, not slides: click tokens, drag pipeline stages, tune sliders on a
+              real document. Stuck? Ask Ada for a hint.
             </p>
           </div>
           <div class="card">
@@ -106,10 +156,11 @@ import { ProgressService } from '../../core/progress.service';
           </div>
           <div class="card">
             <div class="step-badge">3</div>
-            <h3>Earn stars &amp; XP</h3>
+            <h3>Earn stars, XP and badges</h3>
             <p class="muted small">
-              Three stars at 90%. Progress is saved in your browser — replay any challenge to
-              improve.
+              Three stars at 90%. Bonuses for first-try perfection and flawless runs,
+              {{ badgeCount }}
+              badges to collect, a certificate when the Oracle is restored.
             </p>
           </div>
         </div>
@@ -138,7 +189,7 @@ import { ProgressService } from '../../core/progress.service';
       padding-top: 24px;
     }
     .lead {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       max-width: 60ch;
     }
     .hero-stats {
@@ -152,12 +203,21 @@ import { ProgressService } from '../../core/progress.service';
       gap: 2px;
     }
     .stat strong {
-      font-size: 1.15rem;
+      font-size: 1.05rem;
+    }
+    .stat a {
+      color: inherit;
     }
     .world-card {
       display: flex;
       flex-direction: column;
-      min-height: 230px;
+      min-height: 250px;
+    }
+    .world-card.lock {
+      opacity: 0.75;
+    }
+    .world-card.lock .world-icon {
+      filter: grayscale(1);
     }
     .world-icon {
       font-size: 1.8rem;
@@ -202,14 +262,12 @@ import { ProgressService } from '../../core/progress.service';
 })
 export class HomePage {
   protected readonly progress = inject(ProgressService);
+  protected readonly mentor = MENTOR;
   protected readonly worlds = WORLDS;
   protected readonly levels = LEVELS;
   protected readonly levelCount = LEVELS.length;
   protected readonly totalXp = TOTAL_XP;
-
-  readonly nextToPlay = computed(
-    () => LEVELS.find((level) => !(this.progress.results()[level.id]?.stars ?? 0)) ?? LEVELS[0],
-  );
+  protected readonly badgeCount = BADGES.length;
 
   worldStats(worldId: WorldId): { levels: number; stars: number; pct: number } {
     const levels = levelsForWorld(worldId);
@@ -222,5 +280,15 @@ export class HomePage {
       stars,
       pct: levels.length ? (stars / (levels.length * 3)) * 100 : 0,
     };
+  }
+
+  unlockHint(worldId: WorldId): string {
+    const order = wingOrder(LEVELS);
+    const previous = order[order.indexOf(worldId) - 1];
+    const boss = previous ? bossOf(previous, LEVELS) : undefined;
+    const previousWorld = WORLDS.find((world) => world.id === previous);
+    return boss && previousWorld
+      ? `Beat ${boss.title}, the boss of ${previousWorld.wing}, to open this wing.`
+      : '';
   }
 }

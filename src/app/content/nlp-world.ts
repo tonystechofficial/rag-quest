@@ -34,6 +34,9 @@ export const NLP_LEVELS: Level[] = [
   {
     id: 'token-counter',
     world: 'nlp',
+    story:
+      'The Oracle pays for every token it reads. Ada wants you to feel the price before you see it.',
+    hint: 'Count words first, then add one per punctuation mark, extra pieces for long or foreign words, and two or more per emoji.',
     title: 'Token Counter',
     tagline: 'Guess how many tokens a model really reads.',
     concept: 'Tokenization',
@@ -75,6 +78,9 @@ export const NLP_LEVELS: Level[] = [
   {
     id: 'stopword-sweeper',
     world: 'nlp',
+    story:
+      'A junior archivist stripped every stopword from the catalogue. Shakespeare did not survive.',
+    hint: 'Use the reference list literally: only the words on it count, whatever other libraries would do.',
     title: 'Stopword Sweeper',
     tagline: 'Sweep the filler words — and learn when not to.',
     concept: 'Stopwords & text normalization',
@@ -168,6 +174,8 @@ export const NLP_LEVELS: Level[] = [
   {
     id: 'lemma-lab',
     world: 'nlp',
+    story: "The catalogue lists 'ran', 'running' and 'runs' as three different subjects.",
+    hint: 'Ask what the dictionary headword would be. Irregular forms (ran, mice, better) only a dictionary knows.',
     title: 'Lemma Lab',
     tagline: 'running, ran, runs — same word?',
     concept: 'Stemming vs lemmatization',
@@ -251,6 +259,9 @@ export const NLP_LEVELS: Level[] = [
   {
     id: 'tfidf-showdown',
     world: 'nlp',
+    story:
+      'Three shelves, a few sentences each. The Oracle needs to know which words make a shelf unique.',
+    hint: 'A word on every shelf weighs zero. A word on one shelf only weighs the most. Count shelves, not occurrences.',
     title: 'TF-IDF Showdown',
     tagline: 'Which word matters most in this document?',
     concept: 'TF-IDF & keyword search',
@@ -329,6 +340,9 @@ export const NLP_LEVELS: Level[] = [
   {
     id: 'embedding-explorer',
     world: 'nlp',
+    story:
+      "The Hall's map places words by meaning. New words arrive without coordinates — the boss of this wing is geometry itself.",
+    hint: 'Find the cluster whose members share the meaning of the word, then land close to its nearest member.',
     title: 'Embedding Explorer',
     tagline: 'Place the word where its meaning lives.',
     concept: 'Embeddings & vector similarity',
@@ -374,6 +388,9 @@ export const NLP_LEVELS: Level[] = [
   {
     id: 'entity-hunter',
     world: 'nlp',
+    story:
+      'The Archive needs to know who, where and when a passage talks about, to filter before it searches.',
+    hint: 'Decide the span first, then the label. Context changes the label: a company can be named after a fruit.',
     title: 'Entity Hunter',
     tagline: 'Who, where, when — tag the entities.',
     concept: 'Named Entity Recognition',
@@ -460,6 +477,8 @@ export const NLP_LEVELS: Level[] = [
   {
     id: 'sentiment-sorter',
     world: 'nlp',
+    story: "Customer reviews flood the Hall. The Oracle thinks 'not bad' is bad.",
+    hint: "Read the whole sentence: negation flips, 'but' decides, and sarcasm says the opposite of its words.",
     title: 'Sentiment Sorter',
     tagline: 'Positive, negative… or a trap?',
     concept: 'Text classification',

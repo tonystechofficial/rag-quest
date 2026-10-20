@@ -100,6 +100,30 @@ export function pickScore(
   return Math.min(100, (gathered / best) * 100);
 }
 
+export interface BonusInput {
+  scorePct: number;
+  attempts: number;
+  flawless: boolean;
+  hinted: boolean;
+}
+
+export interface Bonus {
+  firstTry: number;
+  flawless: number;
+  total: number;
+}
+
+export const FIRST_TRY_BONUS = 10;
+export const FLAWLESS_BONUS = 20;
+
+/** Extra XP on top of the level's XP: three stars on the first attempt, and a flawless un-hinted run. */
+export function bonusXp(input: BonusInput): Bonus {
+  const firstTry =
+    input.attempts === 1 && starsForScore(input.scorePct) === 3 ? FIRST_TRY_BONUS : 0;
+  const flawless = input.flawless && !input.hinted ? FLAWLESS_BONUS : 0;
+  return { firstTry, flawless, total: firstTry + flawless };
+}
+
 /** Radius (in map units) inside which a placement counts as perfect. */
 export const PLACEMENT_TOLERANCE = 0.12;
 /** Beyond tolerance + range the placement scores 0. */

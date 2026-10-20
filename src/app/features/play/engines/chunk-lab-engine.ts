@@ -220,6 +220,8 @@ export class ChunkLabEngine {
     const rep = this.report();
     this.completed.emit({
       scorePct: rep.score,
+      flawless: rep.score >= 90,
+      feats: rep.score >= 95 ? ['chunk-95'] : [],
       summary: `${rep.hits} of ${rep.results.length} questions answerable with ${this.size()}-word chunks and ${this.overlapWords()} words of overlap`,
     });
   }

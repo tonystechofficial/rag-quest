@@ -30,6 +30,9 @@ export const RAG_LEVELS: Level[] = [
   {
     id: 'pipeline-builder',
     world: 'rag',
+    story:
+      'The blueprints of the Retrieval Engine fell off the wall. Ada remembers two phases: offline, then online.',
+    hint: 'Indexing happens once, before any question: load, chunk, embed, store. Only then does a question arrive.',
     title: 'Pipeline Builder',
     tagline: 'Put the RAG pipeline back in order.',
     concept: 'RAG architecture',
@@ -113,6 +116,9 @@ export const RAG_LEVELS: Level[] = [
   {
     id: 'chunk-master',
     world: 'rag',
+    story:
+      'The customer handbook must be shelved in passages. Too small and facts lose their sentence; too big and the Oracle drowns.',
+    hint: 'Watch the failing questions as you move the slider: one needs two sentences kept together, one needs a short sentence intact.',
     title: 'Chunk Master',
     tagline: 'Tune chunk size and overlap on a real document.',
     concept: 'Chunking strategies',
@@ -150,6 +156,8 @@ export const RAG_LEVELS: Level[] = [
   {
     id: 'retrieval-ranker',
     world: 'rag',
+    story: 'Six passages come back for every question. The Oracle can only read three.',
+    hint: 'Ignore shared words. Ask instead: if the Oracle read only this passage, would its answer get better?',
     title: 'Retrieval Ranker',
     tagline: 'Pick the chunks that actually answer the question.',
     concept: 'Relevance, lexical vs semantic matching',
@@ -307,6 +315,9 @@ export const RAG_LEVELS: Level[] = [
   {
     id: 'context-budget',
     world: 'rag',
+    story:
+      "The Oracle's memory holds a fixed number of tokens. Every chunk you add pushes another one out.",
+    hint: 'Think relevance per token: a cheap useful chunk beats an expensive complete one. Try combinations; the counter never lies.',
     title: 'Context Budget',
     tagline: 'Spend your tokens where the answer lives.',
     concept: 'Context window management',
@@ -433,6 +444,9 @@ export const RAG_LEVELS: Level[] = [
   {
     id: 'hallucination-hunter',
     world: 'rag',
+    story:
+      "The Oracle's answers sound perfect. Ada wants every sentence checked against the source.",
+    hint: "For each claim, find the sentence that supports it. A missing condition ('mainland') is as unsupported as an invented fact.",
     title: 'Hallucination Hunter',
     tagline: 'Which claims does the context actually support?',
     concept: 'Grounding & faithfulness',
@@ -530,6 +544,8 @@ export const RAG_LEVELS: Level[] = [
   {
     id: 'rag-boss',
     world: 'rag',
+    story: "The final inspection. Ada asks the questions the Oracle's builders argue about.",
+    hint: 'Separate retrieval failures from generation failures, and remember what metadata can do that similarity cannot.',
     title: 'RAG Boss Quiz',
     tagline: 'Everything you learned, one final exam.',
     concept: 'RAG evaluation & operations',

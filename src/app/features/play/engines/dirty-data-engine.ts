@@ -244,6 +244,8 @@ export class DirtyDataEngine {
     const m = this.metrics();
     this.completed.emit({
       scorePct: this.score(),
+      flawless: this.score() >= 90,
+      feats: this.score() === 100 ? ['all-issues-found'] : [],
       summary: m
         ? `${m.tp} of ${this.challenge().issues.length} issues found, ${m.fp} false alarms`
         : '',

@@ -4,6 +4,9 @@ export const DATA_LEVELS: Level[] = [
   {
     id: 'dirty-data',
     world: 'data',
+    story:
+      "The customer ledger feeds tomorrow's churn model. Ada found eight problems in ten rows. Can you?",
+    hint: 'Read each column as a type: an id should be unique, an email has a domain, an age is a plausible number, dates share one format, categories one spelling.',
     title: 'Dirty Data Detective',
     tagline: 'Find every broken cell before the model eats it.',
     concept: 'Data cleaning & validation',
@@ -87,6 +90,8 @@ export const DATA_LEVELS: Level[] = [
   {
     id: 'mean-median-monsters',
     world: 'data',
+    story: 'The Oracle reported an average salary of 10.7 k€. Nobody in the team recognised it.',
+    hint: 'Ask what one extreme value does to each statistic. Means move; medians and percentiles barely do.',
     title: 'Mean, Median & Monsters',
     tagline: 'One outlier can lie to a whole dashboard.',
     concept: 'Robust statistics & outliers',
@@ -176,6 +181,9 @@ export const DATA_LEVELS: Level[] = [
   {
     id: 'split-smart',
     world: 'data',
+    story:
+      'A model scored 99% in the Vault and 70% on the street. Ada suspects the test set saw too much.',
+    hint: 'Whatever the model could have seen before the test is leakage: shared rows, future data, statistics fitted on everything.',
     title: 'Split Smart',
     tagline: 'Leakage is why offline metrics lie.',
     concept: 'Train / validation / test & data leakage',
@@ -264,6 +272,8 @@ export const DATA_LEVELS: Level[] = [
   {
     id: 'data-shapes',
     world: 'data',
+    story: "Nine deliveries arrived at the Vault's loading dock. Each needs the right shelf.",
+    hint: 'Ask two questions: is there a fixed schema (columns)? If not, do the values describe themselves (keys, tags)?',
     title: 'Data Shapes',
     tagline: 'Structured, semi-structured or unstructured?',
     concept: 'Data types & why RAG exists',

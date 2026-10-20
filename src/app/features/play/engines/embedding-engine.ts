@@ -241,6 +241,10 @@ export class EmbeddingEngine extends RoundEngine {
     this.guess.set(null);
   }
 
+  protected override feats(): string[] {
+    return this.scores().some((score) => score === 100) ? ['bullseye'] : [];
+  }
+
   protected override summary(): string {
     return `Average placement score of ${Math.round(this.averageScore())}% over ${this.total()} words`;
   }

@@ -9,12 +9,17 @@ export const routes: Routes = [
   {
     path: 'world/:worldId',
     loadComponent: () => import('./features/world/world-page').then((m) => m.WorldPage),
-    title: 'World · RAG Quest',
+    title: 'Wing · RAG Quest',
   },
   {
     path: 'play/:levelId',
     loadComponent: () => import('./features/play/play-page').then((m) => m.PlayPage),
-    title: 'Play · RAG Quest',
+    title: 'Quest · RAG Quest',
+  },
+  {
+    path: 'badges',
+    loadComponent: () => import('./features/badges/badges-page').then((m) => m.BadgesPage),
+    title: 'Badges · RAG Quest',
   },
   {
     path: 'glossary',
